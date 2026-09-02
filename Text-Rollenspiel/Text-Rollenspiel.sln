@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37531.7 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Text-Rollenspiel", "Text-Rollenspiel\Text-Rollenspiel.csproj", "{FC4D32ED-8CD1-41BA-8EB7-A348481A02DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC4D32ED-8CD1-41BA-8EB7-A348481A02DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4D32ED-8CD1-41BA-8EB7-A348481A02DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4D32ED-8CD1-41BA-8EB7-A348481A02DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4D32ED-8CD1-41BA-8EB7-A348481A02DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {999C35D9-6AD8-4C35-B183-F6B584D3722A}
+	EndGlobalSection
+EndGlobal
