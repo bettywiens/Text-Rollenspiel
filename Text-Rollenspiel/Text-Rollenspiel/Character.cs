@@ -20,6 +20,10 @@ namespace Text_Rollenspiel
 
         public int Health { get; set; }
 
+        public int TalkingSpeed { get; set; }
+
+        public int TalkingSlow { get; set; }
+
         public List<string> Abilities { get; set; } 
 
     public static void PrintStats(Character character)

@@ -20,10 +20,10 @@ namespace Text_Rollenspiel
         public Knight()
         {
             Attack = 30;
-            Defense = 16;
+            Defense = 0;
             Agility = 10;
             Luck = 32;
-            Health = 100;
+            Health = 300;
         }
 
 

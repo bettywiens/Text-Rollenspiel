@@ -27,7 +27,7 @@ namespace Text_Rollenspiel
             {
                 foreach (Weapon weapon in inventory.Weapons)
                 {
-                    weapons = weapons + $"* {weapon.Name}\n";
+                    weapons = weapons + $"\n* {weapon.Name}";
                 }
             }
             else

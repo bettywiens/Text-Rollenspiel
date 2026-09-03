@@ -9,18 +9,19 @@ namespace Rollenspiel
         {
             Character player = new Character();
 
-            Console.WriteLine("Spieler, was ist dein Name? ");
-            player.Name = Console.ReadLine();
+            Console.Write("Spieler, was ist dein Name? ");
+            player.Name = Console.ReadLine();           
 
-            Console.WriteLine("Wähle deine Profession:\nRitter");
+            Console.Write("Wähle deine Profession (Ritter): ");
             string profession = Console.ReadLine().ToLower();
+            
             Console.Clear();
 
             switch (profession)
             {
                 case "ritter":
                     player = SetPlayer(player, "knight");
-                    Character.PrintStats(player); Console.Read();
+                    Character.PrintStats(player); Console.ReadLine();
                     Game.LoadingAnimation("");
                     Console.Clear();
                     Game.GameStart(player, "knight");
