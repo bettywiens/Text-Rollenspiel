@@ -24,12 +24,12 @@ namespace Rollenspiel
                     Character.PrintStats(player); Console.ReadLine();
                     Game.LoadingAnimation("");
                     Console.Clear();
-                    Game.GameStart(player, "knight");
+                    Game.GameStart(player, "knight"); // Startet das Spiel
                     break;
             }
 
         }
-
+        // Setzt Eigenschaften von Character Objekten fest, abhängig von dessen Charakterbeschreibung:
         public static Character SetPlayer(Character player, string profession)
         {
             switch (profession)

@@ -25,12 +25,13 @@ namespace Text_Rollenspiel
             }
 
             Inventory inventory = Intro(player, professionName); 
-            Inventory inventoryAfterLevel1 = Level1(player, inventory);
-            Inventory.ShowInventory(inventory);
+            Level1(player, inventory);
+            
         }
         public static Inventory Intro(Character player, string profession)
         {
             int talkingSpeed = 25;
+            string userChoice = "";
 
             Inventory playerInventory = new Inventory();
             playerInventory.Weapons = new List<Weapon>();
@@ -44,7 +45,7 @@ namespace Text_Rollenspiel
             Console.Clear();
 
             Narrator("Du betritst ein Verlies, du weißt nicht wie du hergekommen bist oder was du hier machst.");
-            Narrator("Als du dich umschaust tritt ein alter gekrümmter Mann aus der Ecke, du siehst weder eine Tür noch eine andere Öffnung, du wunderst dich wo er herkommt");            
+            Narrator("Als du dich umschaust tritt ein alter gekrümmter Mann aus der Ecke, du siehst weder eine Tür noch eine andere Öffnung, du wunderst dich wo er herkommt.");            
             
             Speak("?", $"Hallo {player.Name}... ", talkingSpeed);
             Speak("", $"Du bist also {profession}...", talkingSpeed);
@@ -54,11 +55,12 @@ namespace Text_Rollenspiel
             Speak("?", "In den Verliesen ist dies allerdings egal, das wirst du noch früher oder später bemerken.", talkingSpeed);
             Speak("", $"Hier ist eine Tasche, die wirst du für deine Waffen brauchen.", talkingSpeed);
 
-            Description($"Du hast eine Tasche erhalten ~ tippe (e), um den Inhalt der Tasche anzuzeigen", "neutral", "question");   
+            Description($"Du hast eine Tasche erhalten ~ tippe (e), um den Inhalt der Tasche anzuzeigen: ", "neutral", "question");   
 
+            // Neue Waffe wird zum Inventory hinzugefügt:
             playerInventory.Weapons.Add(new Weapon() { Name = "Amateur Schwert", Description = "Einfaches Anfänger Schwert", AttackDamage = player.Attack });
 
-            string userChoice = Console.ReadLine();
+            userChoice = Console.ReadLine();
 
             if (userChoice.Equals("e"))
             {
@@ -68,20 +70,19 @@ namespace Text_Rollenspiel
             Speak("?", $"Wie du siehst liegt dort ein {Inventory.ShowWeapons(0, playerInventory)} in der Tasche.", talkingSpeed);
             Speak("", "Du bist kein Amateur? In den Verließen ist das am Anfang jeder, also glaub dich nicht besser als du bist.", talkingSpeed);
             Speak("", "Deine Einführung ist vorbei, ich glaube ich sehe auch deinen ersten Feind hinter dir.", talkingSpeed);
-            Speak("", "Viel Spaß...", 30);
+            Speak("", "Viel Spaß...", talkingSpeed);
             
             deathEater = SetEnemy("deathEater");
 
             Description("Ein Aasfresser ist hinter dir aufgetaucht", "neutral", "normal");
             Narrator($"{deathEater.Description}");
             Description("Tippe (f) zum fliehen oder (k) zum kämpfen", "neutral", "question");
-
+            
+            // Nimmt Eingabe vom Spieler und Startet entweder den Kampf oder Fluchtversuch:
             userChoice = GetUserInput(fightOrFlee);
             FightOrFlee(userChoice, players, deathEater, playerInventory);
 
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();            
 
             Narrator($"Der Aasfresser fällt tot um und verschmilzt im Boden, so als ob er nie dagewesen ist.");
             Narrator($"Bevor du begreifen kannst was hier vor sich geht drehst du dich erschrocken um, als du bemerkst, dass der alte Mann wieder hinter dir steht.");
@@ -94,10 +95,13 @@ namespace Text_Rollenspiel
             Narrator("Bevor du protestieren kannst, schubst der alte Mann dich nach vorne und du fällst durch den Boden.");
             LoadingAnimation("");
             Console.Clear();
+
             return playerInventory;
         }
-        public static Inventory Level1(Character player, Inventory playerInventory)
+        public static void Level1(Character player, Inventory playerInventory)
         {
+            string shouldGortJoin = "";
+
             Character gort = new Character();
             Program.SetPlayer(gort, "level1Companion");
             gort.Name = "Gort";
@@ -125,7 +129,8 @@ namespace Text_Rollenspiel
             Speak("Gort", "Du könntest etwas Hilfe gebrauchen, möchtest du, dass ich dich auf diesem Level begleite?", gort.TalkingSpeed);
             Description("Soll Gort dich auf diesem Level begleiten (j) oder (n)?", "neutral", "question");
             
-            string shouldGortJoin = GetUserInput(yesOrNo);
+            // Nimmt (j) oder (n) input vom Spieler an und gibt es zurücK:
+            shouldGortJoin = GetUserInput(yesOrNo);
 
             if (shouldGortJoin.Equals("j"))
             {
@@ -133,30 +138,37 @@ namespace Text_Rollenspiel
                 Description("Gort ist deiner Gruppe beigetreten!", "positive", "normal");
                 LoadingAnimation("");
                 Console.Clear();
-                playerInventory = Level1WithGort(player, gort, playerInventory);
+                // Level 1 wird mit Gort in der Gruppe fortgeführt:
+                Level1WithGort(player, gort, playerInventory);
             }
             else
             {
                 Description("Gort begleitet dich nicht auf diesem Level", "neutral", "normal");
                 LoadingAnimation("");
                 Console.Clear();
-                playerInventory = Level1WithoutGort(player, gort, playerInventory);
+                // Level 1 wird ohne Gort in der Gruppe fortgeführt:
+                Level1WithoutGort(player, gort, playerInventory);
             }
-            return playerInventory; 
         }
-        public static Inventory Level1WithGort(Character player, Character gort, Inventory playerInventory)
+        public static void Level1WithGort(Character player, Character gort, Inventory playerInventory)
         {
+            string foughtOrFled = "";
             int oldWomanTalkingSpeed = 45;
+            string drinkFluid = "";
+            string userChoice = "";
 
+            // Gegner für Level 1:
             Enemy mosquito = new Enemy();
             mosquito = SetEnemy("mosquito");
             Enemy mutantWolf = new Enemy();
             mutantWolf = SetEnemy("mutantWolf");
             int enemyTalkingSpeed = 25;
 
+            // Input-Möglichkeiten Level 1:
             List<string> yesOrNo = new List<string> { "j", "n" };
             List<string> fightOrFlee = new List<string> { "f", "k" };
 
+            // Charaktere Level 1:
             List<Character> party = new List<Character>();
             party.Add(player);
             party.Add(gort);
@@ -166,12 +178,13 @@ namespace Text_Rollenspiel
             Speak("", "Wo wir hingehen?", gort.TalkingSlow);
             Speak("", "Dahin wo das Verlies dich haben will... Ich helfe dir nur heile dort anzukommen.", gort.TalkingSlow);
 
+            // Wenn der Health vom Spieler unter 100 liegt, bietet Gort ihm einen Heilungstrank an:
             if (player.Health < 100)
             {
                 Speak("", "Du siehst übrigens fertig aus, hier trink das, das wird deinen Zustand etwas verbessern.", gort.TalkingSpeed);
                 Narrator("Gort gibt dir ein verdächtig aussehendes Fläschchen mit einer lila übel riechenden Flüssigkeit.");
                 Description("Flüssigkeiten trinken? (j) oder (n)", "neutral", "question");
-                string drinkFluid = GetUserInput(yesOrNo);
+                drinkFluid = GetUserInput(yesOrNo);
 
                 if (drinkFluid.Equals("j")){
                     player.Health = player.Health + 50;
@@ -189,11 +202,12 @@ namespace Text_Rollenspiel
             Speak("Gort", "Hier nimm das!", gort.TalkingSpeed);
             Narrator("Gort gibt dir ein Messer, du nimmst es an und packst das Schwert, dass du bist jetzt bei dir getragen hast in deine Tasche.");
 
+            // Neue Waffe wird ins Inventory hinzugefügt:
             playerInventory.Weapons.Add(new Weapon() { Name = "Nahkampf Messer", Description = "Scharfes Messer, besonders effektiv im Nahkampf", AttackDamage = 38 });
             
             Description($"Neue Waffe! Das {playerInventory.Weapons[1].Name} wurde in deine Tasche hinzugefügt ~ tippe (e), um den Inhalt der Tasche anzuzeigen", "positive", "question");
 
-            string userChoice = Console.ReadLine();
+            userChoice = Console.ReadLine();
 
             if (userChoice.Equals("e"))
             {
@@ -202,9 +216,10 @@ namespace Text_Rollenspiel
 
             Speak("Gort", "Willst du kämpfen oder sollen wir weglaufen?", gort.TalkingSpeed);
             Description("Gort fängt schon an sich zu ducken und wartet auf deine Antwort ~ (f) oder (k)?", "neutral", "question");
-            string choiceToFight = GetUserInput(fightOrFlee);
 
-            FightOrFlee(choiceToFight, party, mosquito, playerInventory);           
+            // Kampf oder Fluchtversuch wird gestartet:
+            userChoice = GetUserInput(fightOrFlee);
+            FightOrFlee(userChoice, party, mosquito, playerInventory);           
 
             Console.Clear();
 
@@ -225,9 +240,11 @@ namespace Text_Rollenspiel
             Speak("", "Ich kann dir Rüstung geben... Gute Rüstung... Dafür musst du mir aber was von deiner Beweglichkeit geben...\nWie du siehst habe ich davon nicht mehr viel...", oldWomanTalkingSpeed);
             Narrator("Du denkst nach und wegst ab ob du lieber bessere Verteidigung hättest, oder deine Beweglichkeit behalten möchtest.");
             Description("Beweglichkeit für Verteidigung eintauschen? (j) oder (n)", "neutral", "question");
-            string agilityForDefense = GetUserInput(yesOrNo);
 
-            if (agilityForDefense.Equals("j"))
+            // Spieler kann entscheiden ob er etwas Beweglichkeit für Verteidigung eintauschen möchte:
+            userChoice = GetUserInput(yesOrNo);
+
+            if (userChoice.Equals("j"))
             {
                 player.Agility -= 5;
                 player.Defense += 50;
@@ -255,9 +272,9 @@ namespace Text_Rollenspiel
 
             Description("Willst du kämpfen oder fliehen? ~ (k) oder (f)", "neutral", "question");
 
-            choiceToFight = GetUserInput(fightOrFlee);
+            userChoice = GetUserInput(fightOrFlee);
 
-            string foughtOrFled = FightOrFlee(choiceToFight, party, mutantWolf, playerInventory);
+            foughtOrFled = FightOrFlee(userChoice, party, mutantWolf, playerInventory);
             
 
             if (foughtOrFled.Equals("k"))
@@ -272,8 +289,9 @@ namespace Text_Rollenspiel
                 Speak("Gort", "War schön dich kennengelernt zu haben.", gort.TalkingSpeed);
 
                 LoadingAnimation("");
-                Console.Clear();
+                Console.Clear(); // Hier würde der Spieler ins nächste Level geschickt werden.
             }
+            // Wenn der Spieler erfolgreich flüchtet, hat er das Spiel verloren:
             else if (foughtOrFled.Equals("f"))
             {
                 Speak("Gort", "Ich hatte dir doch gesagt was das Fliehen für Folgen hat...", gort.TalkingSlow);
@@ -289,13 +307,13 @@ namespace Text_Rollenspiel
                 Narrator("Du erinnerst dich nicht, deine Erinnerungen werden mit jedem Tag weniger");
                 LoadingAnimation("");
                 Exit();
-            }
-
-            return playerInventory;
+            }            
         }
-        public static Inventory Level1WithoutGort(Character player,Character gort, Inventory playerInventory)
+        public static void Level1WithoutGort(Character player,Character gort, Inventory playerInventory)
         {
+            string foughtOrFled = "";
             int oldWomanTalkingSpeed = 45;
+            string userChoice = "";
 
             Enemy mosquito = new Enemy();
             mosquito = SetEnemy("mosquito");
@@ -315,9 +333,9 @@ namespace Text_Rollenspiel
             Narrator("Du duckst dich aber es ist bereits zu spät");
             Description("Kämpfen oder fliehen? ~ (f) oder (k)", "neutral", "question");
 
-            string choiceToFight = GetUserInput(fightOrFlee);
-
-            FightOrFlee(choiceToFight, party, mosquito, playerInventory);
+            // Abfrage Fluchtversuch oder Kampf gegen Moskito:
+            userChoice = GetUserInput(fightOrFlee);
+            FightOrFlee(userChoice, party, mosquito, playerInventory);
 
             Narrator("Du fragst dich wie du das überleben konntest, und guckst zu wie der riesige Moskito im Boden versinkt.");
             Narrator("Du gehst entlang des Weges, der im dimmen Licht zu erkennen ist.");
@@ -334,11 +352,13 @@ namespace Text_Rollenspiel
             Narrator("Bei nähere Betrachtung siehst du nicht wo die alte Frau endet und der \"Raum\" anfängt.");
 
             Description("Beweglichkeit für Verteidigung eintauschen? (j) oder (n)", "neutral", "question");
-            string agilityForDefense = GetUserInput(yesOrNo);
 
-            if (agilityForDefense.Equals("j"))
+            // Spieler kann entscheiden ob er Beweglichkeit gegen Verteidigung eintauschen möchte:
+            userChoice = GetUserInput(yesOrNo);
+
+            if (userChoice.Equals("j"))
             {
-                player.Agility -= 10;
+                player.Agility -= 10; // Spieler bekommt einen schlechteren Deal, wenn er ohne Gort mit der alten Frau redet;
                 player.Defense += 40;
 
                 Description($"Beweglichkeit - 5 = {player.Agility}", "negative", "normal");
@@ -364,9 +384,9 @@ namespace Text_Rollenspiel
 
             Description("Kämpfen oder fliehen? ~ (f) oder (k)", "neutral", "question");
 
-            choiceToFight = GetUserInput(fightOrFlee);
-
-            string foughtOrFled = FightOrFlee(choiceToFight, party, mutantWolf, playerInventory);
+            // Abfrage Kampf oder Fluchtversuch:
+            userChoice = GetUserInput(fightOrFlee);
+            foughtOrFled = FightOrFlee(userChoice, party, mutantWolf, playerInventory);
 
             if (foughtOrFled.Equals("k"))
             {
@@ -381,6 +401,7 @@ namespace Text_Rollenspiel
                 LoadingAnimation("");
                 Console.Clear();
             }
+            // Spieler hat verloren, wenn er versucht hat zu fliehen, weiß dies aber nicht, da er Gort nicht aufgenommen hat:
             else if (foughtOrFled.Equals("f"))
             {
                 Speak("?", "Wusstest du etwa nicht was Fliehen hier zu Folge hat?", enemyTalkingSpeed);
@@ -397,69 +418,21 @@ namespace Text_Rollenspiel
                 Narrator("Du erinnerst dich nicht, deine Erinnerungen werden mit jedem Tag weniger");
                 LoadingAnimation("");
                 Exit();
-            }
-
-            return playerInventory;
+            }            
         }
-        public static void Description(string line, string setting, string type)
-        {
-            if (type.Equals("normal"))
-            {
-                if (setting.Equals("neutral"))
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write($"-- {line}"); Console.ReadLine();
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else if (setting.Equals("negative"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write($"-- {line}"); Console.ReadLine();
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else if (setting.Equals("positive"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write($"-- {line}"); Console.ReadLine();
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-            }
-            else if (type.Equals("question"))
-            {
-                if (setting.Equals("neutral"))
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write($"-- {line} ");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else if (setting.Equals("negative"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write($"-- {line} ");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else if (setting.Equals("positive"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write($"-- {line} ");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-            }
-        }
+        // Startet je nach gewählter Option entweder einen Kampf oder einen Fluchtversuch:
         static string FightOrFlee(string option, List<Character> players, Enemy enemy, Inventory inventory)
         {
             Character player = players[0];
             switch (option)
             {
                 case "k":
-
                     StartFight(players, enemy, inventory);
                     return "k";
                     
                 case "f":                   
                     TryFleeing(player, enemy, inventory);
                     return "f";
-
             }
             return "0";
         }
@@ -470,8 +443,8 @@ namespace Text_Rollenspiel
             players.Add(player);
 
             bool looping = true;
-            string choice;
-            double lostHealthDouble = (((100.00 - player.Luck)/100.00) * player.Health)/3; // Wenn Fliehen fehlschlägt, verliert Spieler health
+            string choice = "";
+            double lostHealthDouble = (((100.00 - player.Luck)/100.00) * player.Health)/3; // Wenn Fliehen fehlschlägt, verliert Spieler health proportional zur Gesamt-Health
             int lostHealth = Convert.ToInt32(lostHealthDouble); 
             List<string> validCoinFlipChoices = new List<string>
             {
@@ -496,7 +469,7 @@ namespace Text_Rollenspiel
                     else
                     {
                         Console.Write("Du konntest nicht fliehen."); Console.ReadLine();
-                        if (player.Agility < 15)
+                        if (player.Agility < 15) // Wenn der Spieler nicht sehr beweglich ist, verletzt er sich bei einem fehlgeschlagenen Fluchtversuch
                         {
                             Console.Write("Du hast dir beim Fliehen das Bein verletzt."); Console.ReadLine();
                             player.Health = player.Health - lostHealth;
@@ -513,46 +486,54 @@ namespace Text_Rollenspiel
                 }
             }
         }
+        // Startet ein Kampf zwischen einem Gegner und einem oder mehr Charakteren:
         static void StartFight(List<Character> players, Enemy enemy, Inventory inventory)
-        {       
+        {   
             int amountAttacks = enemy.Attacks.Count;
             int amountPlayers = players.Count;
+            int randomAttack = 0;
+            int randomPlayer = 0;
+            string attack1 = "";
+            int attack1Damage = 0;
+            Character player;
+
             bool fighting = true;
             Random rnd = new Random();
 
             Console.Clear();
-            
 
-            //while (fighting)
-            //{
-            //    int randomAttack = rnd.Next(0, amountAttacks);
-            //    int randomPlayer = rnd.Next(0, amountPlayers);
-            //    Character player = players[randomPlayer];
-            //    string attack1 = enemy.Attacks[randomAttack].AttackName;
-            //    int attack1Damage = enemy.Attacks[randomAttack].Damage;
-            //    attack1Damage -= Convert.ToInt32(player.Defense * 0.5);
+            // Es wird solange gekämpft, bis entweder der Gegner oder der Spieler tot ist:
+            while (fighting)
+            {
+                // Es wird ein zufälliger Spieler mit einer zufälligen Attacke jede Kampfrunde angegriffen.
+                randomAttack = rnd.Next(0, amountAttacks);
+                randomPlayer = rnd.Next(0, amountPlayers);
+                player = players[randomPlayer];
+                attack1 = enemy.Attacks[randomAttack].AttackName;
+                attack1Damage = enemy.Attacks[randomAttack].Damage;
+                attack1Damage -= Convert.ToInt32(player.Defense * 0.5); // Gegnerschaden anhand von Verteidigung des Spielers berechnen
 
-            //    Console.ForegroundColor = ConsoleColor.DarkRed;
-            //    Console.Write($"{player.Name} Health: {player.Health}\t{enemy.Name} Health: {enemy.Health}\n"); Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write($"{player.Name} Health: {player.Health}\t{enemy.Name} Health: {enemy.Health}\n"); Console.ReadLine();
+                
+                Description($"Der {enemy.Name} greift {player.Name} an.", "neutral", "normal");
+                Description($"Er verwendet die Attacke {attack1}.", "neutral", "normal");
+                player.Health = player.Health - attack1Damage;                                      // Health wird durch Schaden geringer
+                CheckIfPlayerDead(player.Health);                                                   // Überprüfen ob Spieler tot ist
+                Description($"{player.Name} hat {attack1Damage} Health verloren, Health: {player.Health}\n", "negative", "normal");
 
-            //    Console.ForegroundColor = ConsoleColor.White;
-            //    Description($"Der {enemy.Name} greift {player.Name} an.", "neutral", "normal");
-            //    Description($"Er verwendet die Attacke {attack1}.", "neutral", "normal");
-            //    player.Health = player.Health - attack1Damage;
-            //    CheckIfPlayerDead(player.Health);
-            //    Description($"{player.Name} hat {attack1Damage} Health verloren, Health: {player.Health}\n", "negative", "normal");
+                Description($"{player.Name} kann angreifen! Wähle eine Waffe:\n", "neutral", "question");
+                Console.WriteLine($"{Inventory.ShowWeapons(-1, inventory)}\n");                     // Zeigt Waffen, die Spieler im Inventory hat
+                Weapon weapon1 = GetWeapon(inventory);                                              // Lässt Spieler Waffe auswählen
+                Description($"{player.Name} attakiert {enemy.Name} mit {weapon1.Name}.", "neutral", "normal");
+                enemy.Health = enemy.Health - weapon1.AttackDamage;                                 // Gegner Health nimmt mit Schaden von Spieler Waffe ab
+                Description($"{enemy.Name} nimmt {weapon1.AttackDamage} Schaden.", "positive", "normal");
+                Console.Clear();
+                fighting = CheckIfEnemyDead(enemy.Health, enemy.Name);                              // Wenn Gegner tot ist wird der while loop gestoppt
+            }
 
-            //    Description($"{player.Name} kann angreifen! Wähle eine Waffe:\n", "neutral", "question");
-            //    Console.WriteLine($"{Inventory.ShowWeapons(-1, inventory)}\n");
-            //    Weapon weapon1 = GetWeapon(inventory);
-            //    Description($"{player.Name} attakiert {enemy.Name} mit {weapon1.Name}.", "neutral", "normal");
-            //    enemy.Health = enemy.Health - weapon1.AttackDamage;
-            //    Description($"{enemy.Name} nimmt {weapon1.AttackDamage} Schaden.", "positive", "normal");
-            //    Console.Clear();
-            //    fighting = CheckIfEnemyDead(enemy.Health, enemy.Name);
-            //}
-            
         }
+        // Validiert Spieler Input, mithilfe einer Liste, die alle möglichen inputs enthält:
         static string GetUserInput(List<string> list)
         {
             bool looping = true;
@@ -610,6 +591,7 @@ namespace Text_Rollenspiel
                 return false;
             }            
         }
+        // Überprüft ob Spieler gestorben ist, wenn ja wird das Spiel beendet:
         static void CheckIfPlayerDead(int health)
         {
             if (health <= 0)
@@ -619,6 +601,7 @@ namespace Text_Rollenspiel
                 Exit();
             }
         }
+        // Überprüft ob der Gegner gestorben ist, wenn ja ist der Kampf gewonnen:
         static bool CheckIfEnemyDead(int health, string name)
         {
             if (health <= 0)
@@ -634,6 +617,7 @@ namespace Text_Rollenspiel
             }
 
         }
+        // Fragt die Waffe vom Spieler, während des Kampfes ab:
         static Weapon GetWeapon(Inventory inventory)
         {
             bool looping = true;
@@ -660,6 +644,7 @@ namespace Text_Rollenspiel
             
 
         }
+        // Legt die Eigenschaften für einen Gegner fest:
         static Enemy SetEnemy(string enemyType)
         {
             Enemy enemy = new Enemy();
@@ -693,6 +678,7 @@ namespace Text_Rollenspiel
             }
             return enemy;
         }
+        // Print Format, wenn Dialog gesprochen wird:
         static void Speak(string speaker, string line, int time)
         {
             // Color Choosing Möglichkeit einbauen für verschiedene Charaktere;
@@ -710,16 +696,65 @@ namespace Text_Rollenspiel
             Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.White;
         }
+        // Print Format für beschreibende Texte:
+        public static void Description(string line, string setting, string type)
+        {
+            if (type.Equals("normal"))
+            {
+                if (setting.Equals("neutral"))
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write($"-- {line}"); Console.ReadLine();
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else if (setting.Equals("negative"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"-- {line}"); Console.ReadLine();
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else if (setting.Equals("positive"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write($"-- {line}"); Console.ReadLine();
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+            else if (type.Equals("question"))
+            {
+                if (setting.Equals("neutral"))
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write($"-- {line} ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else if (setting.Equals("negative"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"-- {line} ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else if (setting.Equals("positive"))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write($"-- {line} ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+        }
+        // Print Format für Erzählertexte:
         public static void Narrator(string line)
         {
             Console.Write($"> {line}"); Console.ReadLine();
         }
+        // Beendet das Spiel:
         public static void Exit()
         {
             LoadingAnimation("Closing Game");
 
             Environment.Exit(0);
         }
+        // Ladeanimation:
         public static void LoadingAnimation(string prompt)
         {
             Console.Write($"\n{prompt}");

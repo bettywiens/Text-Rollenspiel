@@ -11,7 +11,7 @@ namespace Text_Rollenspiel
     {
         public List<Weapon> Weapons { get; set; }
 
-
+        // Zeigt alles im Inventory (momentan nur Waffen):
         public static void ShowInventory(Inventory inventory)
         {
             Console.WriteLine($"Waffen:");
@@ -20,6 +20,7 @@ namespace Text_Rollenspiel
                 Console.Write($"\n* {weapon.Name}");
             }
         }
+        // Zeigt nur die Waffen (Möglichkeit entweder alle Waffen oder bestimmte Waffe zu zeigen):
         public static string ShowWeapons(int index, Inventory inventory)
         {
             string weapons = string.Empty;
